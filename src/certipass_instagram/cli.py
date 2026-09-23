@@ -9,13 +9,13 @@ from datetime import date
 from pathlib import Path
 
 from .ledger import ContentLedger
-from .pipeline import PipelineError, create_daily_set, load_draft, publish_draft
+from .pipeline import PipelineError, create_daily_post, load_draft, publish_draft
 
 
 def _parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(prog="certipass-instagram", description="Create a daily certiPass image-post set.")
+    parser = argparse.ArgumentParser(prog="certipass-instagram", description="Create one daily certiPass Instagram post.")
     subs = parser.add_subparsers(dest="command", required=True)
-    draft = subs.add_parser("draft", help="Create one meme, one educational and one informative static post (never publishes).")
+    draft = subs.add_parser("draft", help="Create one meme, educational or informative static post (never publishes).")
     draft.add_argument("--date", type=date.fromisoformat, help="ISO date; defaults to Europe/Chisinau today.")
     draft.add_argument("--ledger", default="data/ledger.json")
     draft.add_argument("--output-dir", default="artifacts")
@@ -35,15 +35,12 @@ def main(argv: list[str] | None = None) -> int:
     args = _parser().parse_args(argv)
     try:
         if args.command == "draft":
-            posts = create_daily_set(day=args.date, ledger_path=args.ledger, output_dir=args.output_dir)
-            print(json.dumps({"posts": [
-                {"id": draft.id, "content_type": draft.content_type, "topic": draft.topic,
-                 "caption": draft.caption,
-                 "draft": str(Path(args.output_dir) / f"{draft.id}.json"),
-                 "post_type": draft.post_type, "images": [str(image) for image in images],
-                 "status": "IDEA", "published": False}
-                for draft, images in posts
-            ]}, ensure_ascii=False, indent=2))
+            draft, images = create_daily_post(day=args.date, ledger_path=args.ledger, output_dir=args.output_dir)
+            print(json.dumps({"id": draft.id, "content_type": draft.content_type, "topic": draft.topic,
+                              "caption": draft.caption,
+                              "draft": str(Path(args.output_dir) / f"{draft.id}.json"),
+                              "post_type": draft.post_type, "images": [str(image) for image in images],
+                              "status": "IDEA", "published": False}, ensure_ascii=False, indent=2))
             return 0
         if args.command == "approve":
             ledger = ContentLedger(args.ledger)

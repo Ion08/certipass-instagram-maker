@@ -154,43 +154,28 @@ class ContentLedger:
         raise RecordNotFoundError("content record was not found")
 
     def reserve(self, draft: ContentDraft) -> dict:
-        """Reserve one post while enforcing a single post per type and date."""
-        return self.reserve_batch([draft])[0]
-
-    def reserve_batch(self, drafts: list[ContentDraft]) -> list[dict]:
-        """Atomically reserve a day's set of distinct post types."""
-        if not drafts:
-            raise ValueError("at least one post is required")
-        rows = []
+        """Atomically reserve at most one post for a date."""
+        row = draft.to_dict()
+        if row["status"] not in VALID_STATUSES or row["status"] != "IDEA":
+            raise InvalidTransitionError("new records must start in IDEA")
+        row["fingerprint"] = _fingerprint(draft)
         now = datetime.now(timezone.utc).isoformat()
-        for draft in drafts:
-            row = draft.to_dict()
-            if row["status"] not in VALID_STATUSES or row["status"] != "IDEA":
-                raise InvalidTransitionError("new records must start in IDEA")
-            row["fingerprint"] = _fingerprint(draft)
-            row["history"] = [{"status": "IDEA", "at": now}]
-            rows.append(row)
-        if len({row["id"] for row in rows}) != len(rows):
-            raise DuplicateContentError("daily post IDs must be unique")
-        if len({(row["publish_date"], row["content_type"]) for row in rows}) != len(rows):
-            raise DuplicateDayError("a post of this type is already planned for the date")
+        row["history"] = [{"status": "IDEA", "at": now}]
         with self._locked():
             records = self._read_records()
-            existing_slots = {(item.get("publish_date"), item.get("content_type", "educational")) for item in records}
-            if any((row["publish_date"], row["content_type"]) in existing_slots for row in rows):
-                raise DuplicateDayError("a post of this type is already reserved for the date")
-            all_rows = records + rows
-            for index, row in enumerate(rows):
-                for prior in all_rows[:len(records) + index]:
-                    row_text = row.get("topic", "") + " " + row.get("hook", "") + " " + row.get("caption", "")
-                    prior_text = " ".join((prior.get("topic", ""), prior.get("hook", ""), prior.get("caption", "")))
-                    if row["fingerprint"] == prior.get("fingerprint") or (
-                        _similarity(row_text, prior_text) >= self.similarity_threshold
-                    ):
-                        raise DuplicateContentError("draft resembles existing content")
-            records.extend(rows)
+            day = draft.publish_date.isoformat()
+            if any(item.get("publish_date") == day for item in records):
+                raise DuplicateDayError("publish date is already reserved")
+            for item in records:
+                if row["fingerprint"] == item.get("fingerprint") or (
+                    _similarity(draft.topic + " " + draft.hook + " " + draft.caption,
+                                " ".join((item.get("topic", ""), item.get("hook", ""), item.get("caption", ""))))
+                    >= self.similarity_threshold
+                ):
+                    raise DuplicateContentError("draft resembles existing content")
+            records.append(row)
             self._write_records(records)
-        return rows
+        return row
 
     def update_status(self, post_id: str, status: str, *, instagram_media_id: str | None = None) -> dict:
         """Append a status event and atomically persist the updated record."""
