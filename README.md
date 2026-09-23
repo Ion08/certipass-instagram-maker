@@ -1,62 +1,50 @@
 # certiPass Instagram Maker
 
-Instrument local-first pentru documentare, redactare și randarea unui Reel vertical pentru contul certiPass.md. Textul este generat de Codex CLI autentificat cu ChatGPT; nu citește `OPENAI_API_KEY` și nu cheamă OpenAI Platform API. Grafica este construită local din tipografie și forme, iar videoclipul este H.264, 9:16. Publicarea Meta este o comandă separată, oprită implicit.
+Automatizare pentru postări statice Instagram certiPass.md: postări cu o imagine sau carusele de 4–6 imagini. Fiecare slide final este un fișier PNG 4:5 cu artwork generat de GPT Image 2 și copy românesc redat exact peste artwork. Nu creează Reels, videoclipuri, pagini HTML sau capturi de ecran.
 
-## Ce poate face acum
+Textul, subiectul și prompturile vizuale sunt pregătite cu Codex CLI autentificat prin ChatGPT. Artwork-ul este generat separat prin OpenRouter, folosind modelul openai/gpt-image-2, iar imaginile rezultate sunt compuse în PNG-uri statice. OpenRouter se plătește separat; abonamentul ChatGPT Plus nu acoperă aceste cereri.
 
-- citește paginile curente certiPass.md și câteva documentații tehnice primare;
-- cere Codex CLI să creeze scenariul în română, cu surse limitate la paginile citite;
-- verifică formatul de bază și blochează sursele neincluse în cercetare;
-- ține o evidență atomică a zilelor și respinge duplicatele apropiate;
-- redă un MP4 1080×1920 local, fără API-uri de imagini/video;
-- trimite conținutul către Instagram doar prin fluxul oficial Meta, cu mai multe verificări explicite.
+## Fluxul actual
 
-Randarea actuală este un Reel animat, numai cu text și grafică simplă, fără voce sau muzică. Verificarea automată nu înlocuiește revizia vizuală și factuală de către o persoană.
+- verifică surse pentru afirmații educaționale și reguli factuale;
+- cere Codex să redacteze o postare românească și prompturile pentru fiecare slide;
+- generează artwork PNG prin OpenRouter;
+- așază textul românesc peste artwork și salvează imaginile 1080×1350;
+- ține evidența subiectelor și oferă artefactele pentru revizie;
+- publicarea Meta rămâne dezactivată implicit și cere găzduire publică HTTPS pentru fiecare PNG.
+
+## Costul imaginilor
+
+Exemplul curent din documentația OpenRouter pentru o imagine 1536×864 la calitate high raportează $0.13; costul variază în funcție de rezoluție și de utilizarea efectivă. Ca ordin de mărime, cinci imagini la acel tarif ar costa aproximativ $0.65 per carusel, sau $19.50 pentru 30 de carusele cu câte cinci slide-uri. Verifică întotdeauna costul afișat în activitatea OpenRouter după o rulare reală.
+
+Setează o limită de cheltuieli în contul OpenRouter. Workflow-ul produce cel mult șase slide-uri într-o rulare și se oprește când OpenRouter raportează credite insuficiente ori o limită de utilizare.
 
 ## Rulare locală
 
-Necesită Python 3.11+, ffmpeg/ffprobe și Codex CLI autentificat prin „Sign in with ChatGPT”. Instalarea Codex CLI și autentificarea se fac separat, prin instrucțiunile oficiale OpenAI.
+Necesită Python 3.11+, Codex CLI autentificat cu ChatGPT, OPENROUTER_API_KEY și conexiune la internet. Nu trimite chei API în chat, capturi de ecran sau Git. Configurează cheia numai în variabile de mediu locale ori în secretele repository-ului.
 
-```sh
-python3 -m venv .venv
-source .venv/bin/activate
-python -m pip install -e '.[dev]'
-certipass-instagram draft
-```
+Comenzile sunt: creează și activează un mediu virtual Python, instalează proiectul cu dependențele de test, setează OPENROUTER_API_KEY și rulează certipass-instagram draft. Draftul JSON și imaginile PNG apar în directorul artifacts. Comanda draft nu publică.
 
-Fișierele apar în `artifacts/`; evidența locală este `data/ledger.json`. `draft` nu publică nimic și nu trimite secrete către Codex. Deschide MP4-ul și JSON-ul înainte de a marca o postare ca pregătită:
+## GitHub Actions
 
-```sh
-certipass-instagram approve reel-YYYY-MM-DD
-```
+Workflow-ul zilnic este oprit implicit. Pentru drafturi programate într-un repository privat:
 
-## Meta și publicarea
+1. Revocă imediat orice cheie OpenRouter pe care ai trimis-o într-o conversație și creează una nouă.
+2. Adaugă cheia nouă ca repository Actions secret OPENROUTER_API_KEY.
+3. Configurează autentificarea Codex/ChatGPT documentată pentru workflow folosind secretul CODEX_AUTH_JSON și mecanismul de rotație existent CODEX_SECRET_WRITE_TOKEN.
+4. Setează repository variable ENABLE_DAILY_DRAFTS=true.
+5. O rulare manuală sau programată va încărca PNG-urile ca artifact privat pentru revizie.
 
-Pentru Instagram Login, configurarea citește `INSTAGRAM_USER_ID`, `INSTAGRAM_ACCESS_TOKEN` și `META_GRAPH_API_VERSION` din variabile de mediu. Folosește numai permisiunile de care are nevoie aplicația ta, inclusiv `instagram_business_basic` și `instagram_business_content_publish`. Nu trimite tokenul în chat, nu-l pune în Git și nu-l include în capturi de ecran. Păstrează-l într-un manager de secrete.
+Nu scrie cheia API într-un fișier tracked și nu o pune în URL-uri ori loguri.
 
-Pentru ca Meta să proceseze Reel-ul, MP4-ul trebuie să fie disponibil prin HTTPS public în momentul cererii. Acest proiect nu configurează încă un serviciu de găzduire media. Nu folosi URL-uri locale, linkuri Drive private sau URL-uri temporare expirate.
+## Meta și publicare
 
-Publicarea rămâne oprită până când sunt setate ambele variabile `INSTAGRAM_PUBLISH_ENABLED=true` și `INSTAGRAM_APP_LIVE_APPROVED=true`, utilizatorul transmite `--confirm-publish`, postarea este marcată `READY`, iar un MP4 găzduit public este furnizat prin `--media-url`. Dacă Meta răspunde ambiguu, ledger-ul blochează repetarea automată până la verificarea manuală a contului.
+Publicarea Instagram rămâne închisă până când app-ul Meta are permisiunile și aprobările necesare și PNG-urile sunt găzduite la URL-uri HTTPS publice pe care Meta le poate descărca. Repository-ul nu setează încă găzduirea publică a imaginilor. Pentru carusel, fiecare slide trebuie să aibă propriul URL HTTPS.
 
-Aplicația Meta văzută în configurarea certiPass este încă în modul de testare, iar permisiunile erau „Ready for testing”. Asta nu demonstrează accesul de producție ori aprobarea App Review. Nu activa publicarea regulată înainte de a confirma cerințele Meta și de a trece app review-ul cerut.
-
-## ChatGPT Plus și GitHub Actions
-
-Fluxul programat folosește `codex exec` autentificat prin contul ChatGPT. Acesta folosește limita de utilizare a planului ChatGPT; nu cere `OPENAI_API_KEY` și nu folosește facturarea OpenAI Platform. OpenAI documentează un flux avansat pentru autentificare personală în CI: runner-ul citește `auth.json`, Codex reîmprospătează sesiunea în timpul unei rulări, iar fișierul actualizat este păstrat înapoi în secret manager. Documentația recomandă autentificarea API pentru automatizări în general; fluxul de abonament este descris pentru infrastructură privată și de încredere. Acest repository este privat.
-
-Workflow-ul `daily-draft.yml` este oprit implicit. Pentru activarea generării zilnice:
-
-1. Pe computerul tău de încredere, configurează Codex CLI să folosească stocare în fișier și autentifică-te cu ChatGPT. `auth.json` trebuie tratat ca o parolă; nu îl trimite în conversație.
-2. În setările repository-ului privat, adaugă `CODEX_AUTH_JSON` cu conținutul fișierului `~/.codex/auth.json`.
-3. Creează un token fine-grained limitat doar la acest repository, cu dreptul de actualizare a Actions secrets; salvează-l ca `CODEX_SECRET_WRITE_TOKEN`. Workflow-ul îl folosește numai pentru a înlocui `CODEX_AUTH_JSON` cu tokenurile Codex actualizate.
-4. Creează repository variable `ENABLE_DAILY_DRAFTS=true`. Cron-ul rulează zilnic la 07:23, ora Chișinăului, și pune JSON-ul și MP4-ul într-un artifact privat pentru revizie.
-
-`auth.json` nu este pus în cache, loguri, artifacts sau în Git. Pentru a respecta limita sesiunii rotate, rulările sunt serializate și actualizează secretul; dacă sesiunea e revocată, va trebui să o autentifici din nou și să înlocuiești secretul. Workflow-ul nu publică nimic pe Instagram.
+După configurarea găzduirii, folosește clientul oficial Meta cu INSTAGRAM_USER_ID, INSTAGRAM_ACCESS_TOKEN și META_GRAPH_API_VERSION. Publicarea cere suplimentar confirmarea explicită, draft marcat READY și variabilele INSTAGRAM_PUBLISH_ENABLED=true și INSTAGRAM_APP_LIVE_APPROVED=true. Nu pune tokenul Meta în Git sau în chat.
 
 ## Verificare
 
-```sh
-PYTHONPATH=src python -m pytest -q
-```
+Rulează testele cu PYTHONPATH=src python -m pytest -q.
 
-Testele folosesc sesiuni și răspunsuri Meta false; nu creează postări publice. Renderer-ul necesită `ffmpeg` și `ffprobe` instalate. Generarea locală prin ChatGPT Plus a fost verificată o dată; fluxul GitHub trebuie activat numai după ce cele două secrete și variabila de mai sus sunt configurate.
+Testele folosesc răspunsuri sintetice/mock și nu cheamă OpenRouter ori Meta și nu creează postări publice. O rulare reală de generare consumă credite OpenRouter.

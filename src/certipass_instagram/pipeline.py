@@ -1,4 +1,4 @@
-"""Orchestrate a single local content-and-Reel draft; publishing is opt-in."""
+"""Orchestrate research, image generation and static post publishing."""
 
 from __future__ import annotations
 
@@ -9,9 +9,10 @@ from pathlib import Path
 from zoneinfo import ZoneInfo
 
 from .ai import CodexGenerator
+from .imagegen import OpenRouterConfig, OpenRouterImageGenerator
 from .ledger import ContentLedger
 from .models import ContentDraft
-from .render import render_reel
+from .render import render_carousel
 from .research import fetch_snapshot
 
 
@@ -25,8 +26,9 @@ def local_today() -> date:
 
 def create_draft(*, day: date | None = None, ledger_path: str | Path = "data/ledger.json",
                  output_dir: str | Path = "artifacts", generator: CodexGenerator | None = None,
-                 render: bool = True) -> tuple[ContentDraft, Path | None]:
-    """Research, generate, reserve the day and render a reviewable MP4 locally."""
+                 image_generator: OpenRouterImageGenerator | None = None,
+                 render: bool = True) -> tuple[ContentDraft, list[Path]]:
+    """Research, write and render a reviewable image post or carousel."""
     target_day = day or local_today()
     ledger = ContentLedger(ledger_path)
     records = ledger.list_records()
@@ -40,16 +42,28 @@ def create_draft(*, day: date | None = None, ledger_path: str | Path = "data/led
     draft = (generator or CodexGenerator()).generate(
         day=target_day, evidence=[page.evidence() for page in pages], recent_topics=recent,
     )
-    ledger.reserve(draft)
     output_dir = Path(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
-    json_path = output_dir / f"reel-{target_day.isoformat()}.json"
-    json_path.write_text(json.dumps(draft.to_dict(), ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    video_path: Path | None = None
+    json_path = output_dir / f"{draft.id}.json"
+    image_paths: list[Path] = []
     if render:
-        video_path = output_dir / f"reel-{target_day.isoformat()}.mp4"
-        render_reel(draft, video_path)
-    return draft, video_path
+        image_generator = image_generator or OpenRouterImageGenerator(OpenRouterConfig.from_env())
+        art_dir = output_dir / "artwork"
+        art_dir.mkdir(parents=True, exist_ok=True)
+        sources = []
+        for index, slide in enumerate(draft.slides, 1):
+            artwork_path = art_dir / f"{draft.id}-art-{index:02d}.png"
+            try:
+                artwork_path.write_bytes(image_generator.generate(slide.image_prompt))
+            except Exception:
+                # Keep credential-bearing provider exceptions out of Actions logs.
+                raise PipelineError(f"Image generation failed on slide {index}; no post was published.") from None
+            sources.append(artwork_path)
+        image_paths = render_carousel(draft, sources, output_dir)
+        draft = ContentDraft.from_dict({**draft.to_dict(), "asset_paths": [str(p) for p in image_paths]})
+    ledger.reserve(draft)
+    json_path.write_text(json.dumps(draft.to_dict(), ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    return draft, image_paths
 
 
 def load_draft(path: str | Path) -> ContentDraft:
@@ -60,15 +74,15 @@ def load_draft(path: str | Path) -> ContentDraft:
         raise PipelineError("Could not load the content draft") from exc
 
 
-def publish_draft(*, draft_path: str | Path, media_url: str, ledger_path: str | Path = "data/ledger.json",
+def publish_draft(*, draft_path: str | Path, media_urls: list[str], ledger_path: str | Path = "data/ledger.json",
                   confirm: bool = False) -> str:
-    """Publish an already-reviewed Reel; two explicit gates prevent accidental posts."""
+    """Publish an already-reviewed static image post or carousel through Meta."""
     if not confirm or os.environ.get("INSTAGRAM_PUBLISH_ENABLED") != "true":
-        raise PipelineError("Publishing is disabled. Review the Reel, pass --confirm-publish, and set INSTAGRAM_PUBLISH_ENABLED=true.")
+        raise PipelineError("Publishing is disabled. Review every image, pass --confirm-publish, and set INSTAGRAM_PUBLISH_ENABLED=true.")
     if os.environ.get("INSTAGRAM_APP_LIVE_APPROVED") != "true":
         raise PipelineError("Meta app is not marked live/approved. Publishing remains disabled.")
-    if not media_url.startswith("https://"):
-        raise PipelineError("Meta must fetch the rendered MP4 from a public HTTPS URL; configure hosting first.")
+    if not media_urls or any(not url.startswith("https://") for url in media_urls):
+        raise PipelineError("Meta must fetch each PNG from a public HTTPS URL; configure image hosting first.")
     from .meta import (InstagramPublisher, MetaAmbiguousPublishError,
                        MetaConfig, MetaTerminalError, MetaTransientError)
     import time
@@ -79,7 +93,9 @@ def publish_draft(*, draft_path: str | Path, media_url: str, ledger_path: str | 
     if row["status"] != "READY":
         raise PipelineError("Draft must be explicitly marked READY in the ledger before publishing.")
     publisher = InstagramPublisher(MetaConfig.from_env(dry_run=False))
-    container_id = publisher.create_reel(video_url=media_url, caption=draft.caption)
+    if len(media_urls) != len(draft.slides):
+        raise PipelineError("Provide one public image URL for each post/carousel slide.")
+    container_id = publisher.create_post(image_urls=media_urls, caption=draft.caption)
     if not container_id:
         raise PipelineError("Meta did not return a container ID.")
     deadline = time.monotonic() + 600
@@ -88,13 +104,13 @@ def publish_draft(*, draft_path: str | Path, media_url: str, ledger_path: str | 
         if status == "FINISHED":
             break
         if status in {"ERROR", "EXPIRED"}:
-            raise PipelineError(f"Meta Reel processing stopped with status {status}.")
+            raise PipelineError(f"Meta image processing stopped with status {status}.")
         time.sleep(10)
     else:
-        raise PipelineError("Meta Reel processing timed out; check the container before retrying.")
+        raise PipelineError("Meta image processing timed out; check the container before retrying.")
     ledger.begin_publishing(draft.id)
     try:
-        media_id = publisher.publish_reel(container_id)
+        media_id = publisher.publish_post(container_id)
     except MetaAmbiguousPublishError:
         ledger.mark_ambiguous(draft.id)
         raise

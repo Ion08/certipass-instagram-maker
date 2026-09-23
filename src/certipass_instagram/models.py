@@ -1,4 +1,4 @@
-"""Shared content contracts for the automation pipeline."""
+"""Shared content contracts for static Instagram image posts."""
 
 from __future__ import annotations
 
@@ -16,11 +16,11 @@ class Source:
 
 
 @dataclass(frozen=True)
-class Scene:
-    narration: str
-    overlay_text: str
-    visual_description: str
-    duration_seconds: float
+class Slide:
+    headline: str
+    body: str
+    image_prompt: str
+    alt_text: str
 
 
 @dataclass(frozen=True)
@@ -32,21 +32,24 @@ class ContentDraft:
     topic: str
     hook: str
     caption: str
-    scenes: tuple[Scene, ...] = ()
+    slides: tuple[Slide, ...] = ()
     sources: tuple[Source, ...] = ()
     visual_family: str = "editorial"
     facts: tuple[str, ...] = ()
-    asset_path: str | None = None
-    media_url: str | None = None
+    asset_paths: tuple[str, ...] = ()
+    media_urls: tuple[str, ...] = ()
     status: str = "IDEA"
     instagram_media_id: str | None = None
     metadata: dict[str, Any] = field(default_factory=dict)
 
+    @property
+    def post_type(self) -> str:
+        return "IMAGE" if len(self.slides) == 1 else "CAROUSEL"
+
     def to_dict(self) -> dict[str, Any]:
-        """Serialize to a JSON-compatible record."""
         result = asdict(self)
         result["publish_date"] = self.publish_date.isoformat()
-        result["scenes"] = [asdict(scene) for scene in self.scenes]
+        result["slides"] = [asdict(slide) for slide in self.slides]
         result["sources"] = [asdict(source) for source in self.sources]
         return result
 
@@ -54,7 +57,12 @@ class ContentDraft:
     def from_dict(cls, raw: dict[str, Any]) -> ContentDraft:
         values = dict(raw)
         values["publish_date"] = date.fromisoformat(values["publish_date"])
-        values["scenes"] = tuple(Scene(**scene) for scene in values.get("scenes", []))
+        values["slides"] = tuple(Slide(**slide) for slide in values.get("slides", []))
         values["sources"] = tuple(Source(**source) for source in values.get("sources", []))
         values["facts"] = tuple(values.get("facts", ()))
+        values["asset_paths"] = tuple(values.get("asset_paths", ()))
+        values["media_urls"] = tuple(values.get("media_urls", ()))
+        # Old Reel drafts are intentionally rejected: they are a different product.
+        if "scenes" in values:
+            raise ValueError("Reel drafts are no longer supported; create an image post or carousel.")
         return cls(**values)

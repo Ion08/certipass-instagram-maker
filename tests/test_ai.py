@@ -14,16 +14,18 @@ def valid_payload(url="https://docs.python.org/3/tutorial/floatingpoint.html"):
         "visual_family": "editorial", "facts": ["Unele fracții zecimale nu au reprezentare binară exactă."],
         "sources": [{"title": "Python docs", "url": url, "accessed_at": "2026-09-23T00:00:00+00:00",
                      "supports": "binary floating point representation"}],
-        "scenes": [{"narration": f"Scena explică numărul {i}.", "overlay_text": f"Cadru {i}",
-                    "visual_description": "Formă geometrică", "duration_seconds": 3.0} for i in range(5)],
+        "slides": [{"headline": f"Cadru {i}", "body": f"Explicația numărul {i}.",
+                    "image_prompt": "Bright editorial illustration about binary number systems.",
+                    "alt_text": f"Ilustrație educațională {i}"} for i in range(1, 5)],
     }
 
 
-def test_draft_parser_and_validator_enforce_facts_sources_and_scene_length():
+def test_draft_parser_and_validator_enforce_facts_sources_and_static_slides():
     payload = valid_payload()
     draft = _draft_from_json(payload, date(2026, 9, 23))
     _validate_draft(draft, [{"url": payload["sources"][0]["url"]}])
-    assert draft.id == "reel-2026-09-23"
+    assert draft.id == "post-2026-09-23"
+    assert draft.post_type == "CAROUSEL"
     payload["sources"][0]["url"] = "https://made-up.example/claim"
     with pytest.raises(ValueError, match="not supplied"):
         _validate_draft(_draft_from_json(payload, draft.publish_date), [{"url": "https://docs.python.org/3/tutorial/floatingpoint.html"}])
@@ -34,6 +36,14 @@ def test_facts_without_sources_are_rejected():
     payload["sources"] = []
     with pytest.raises(ValueError, match="need sources"):
         _validate_draft(_draft_from_json(payload, date(2026, 9, 23)), [])
+
+
+def test_single_slide_is_a_static_image_post():
+    payload = valid_payload()
+    payload["slides"] = payload["slides"][:1]
+    draft = _draft_from_json(payload, date(2026, 9, 23))
+    _validate_draft(draft, [{"url": payload["sources"][0]["url"]}])
+    assert draft.post_type == "IMAGE"
 
 
 def test_bac_claim_requires_current_official_ance_reference():

@@ -78,18 +78,34 @@ class InstagramPublisher:
         self.session = session if session is not None else requests.Session()
         self.base_url = f"{self.BASE_URL}/v{config.api_version}"
 
-    def create_reel(self, *, video_url: str, caption: str, share_to_feed: bool = True) -> str | None:
-        """Create a Reel container and return its ID; dry-run returns None offline."""
+    def create_post(self, *, image_urls: list[str], caption: str) -> str | None:
+        """Create one image or carousel container; URLs must be publicly fetchable HTTPS."""
         if self.config.dry_run:
             return None
-        if not video_url.startswith("https://"):
-            raise MetaConfigurationError("Instagram must be able to fetch the Reel from an HTTPS URL")
-        data = self._request(
-            "POST", f"/{self.config.instagram_user_id}/media",
-            data={"media_type": "REELS", "video_url": video_url, "caption": caption,
-                  "share_to_feed": "true" if share_to_feed else "false"},
-            operation="create",
-        )
+        if not image_urls or len(image_urls) > 7 or any(not url.startswith("https://") for url in image_urls):
+            raise MetaConfigurationError("Provide one to seven publicly fetchable HTTPS PNG URLs.")
+        children: list[str] = []
+        if len(image_urls) > 1:
+            for image_url in image_urls:
+                child = self._request(
+                    "POST", f"/{self.config.instagram_user_id}/media",
+                    data={"image_url": image_url, "is_carousel_item": "true"},
+                    operation="create",
+                ).get("id")
+                if not isinstance(child, str) or not child:
+                    raise MetaTerminalError("Meta response did not contain a carousel slide ID")
+                children.append(child)
+            data = self._request(
+                "POST", f"/{self.config.instagram_user_id}/media",
+                data={"media_type": "CAROUSEL", "children": ",".join(children), "caption": caption},
+                operation="create",
+            )
+        else:
+            data = self._request(
+                "POST", f"/{self.config.instagram_user_id}/media",
+                data={"image_url": image_urls[0], "caption": caption},
+                operation="create",
+            )
         container_id = data.get("id")
         if not isinstance(container_id, str) or not container_id:
             raise MetaTerminalError("Meta response did not contain a media container ID")
@@ -105,7 +121,7 @@ class InstagramPublisher:
             raise MetaTerminalError(f"Instagram media container is {status.lower()}")
         return status
 
-    def publish_reel(self, container_id: str) -> str | None:
+    def publish_post(self, container_id: str) -> str | None:
         """Publish one ready container; ambiguous results must never be blindly retried."""
         if self.config.dry_run:
             return None

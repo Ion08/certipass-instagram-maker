@@ -1,4 +1,4 @@
-name: Daily certiPass Reel draft
+name: Daily certiPass Instagram image draft
 
 on:
   schedule:
@@ -31,10 +31,8 @@ jobs:
         with:
           node-version: "22"
 
-      - name: Install local renderer and Codex CLI
+      - name: Install PNG renderer and Codex CLI
         run: |
-          sudo apt-get update
-          sudo apt-get install -y ffmpeg
           python -m pip install -e '.[dev]'
           npm install --global @openai/codex@0.156.1
 
@@ -69,9 +67,10 @@ jobs:
             "$HOME/.codex/auth.json" >/dev/null
           printf 'cli_auth_credentials_store = "file"\n' > "$HOME/.codex/config.toml"
 
-      - name: Create and render one Reel draft
+      - name: Generate and render static image post
         env:
           PYTHONPATH: src
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
         run: python -m certipass_instagram.cli draft
 
       - name: Save refreshed ChatGPT subscription login
@@ -104,7 +103,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: certipass-reel-draft-${{ github.run_id }}
+          name: certipass-image-post-draft-${{ github.run_id }}
           path: artifacts/
           if-no-files-found: ignore
           retention-days: 30
