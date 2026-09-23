@@ -1,0 +1,64 @@
+"""Command-line interface for creating, reviewing and explicitly publishing Reels."""
+
+from __future__ import annotations
+
+import argparse
+import json
+import sys
+from datetime import date
+from pathlib import Path
+
+from .ledger import ContentLedger
+from .pipeline import PipelineError, create_draft, load_draft, publish_draft
+
+
+def _parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(prog="certipass-instagram", description="Create a certiPass Reel draft locally.")
+    subs = parser.add_subparsers(dest="command", required=True)
+    draft = subs.add_parser("draft", help="Research, write and render a local Reel draft (never publishes).")
+    draft.add_argument("--date", type=date.fromisoformat, help="ISO date; defaults to Europe/Chisinau today.")
+    draft.add_argument("--ledger", default="data/ledger.json")
+    draft.add_argument("--output-dir", default="artifacts")
+    approve = subs.add_parser("approve", help="Mark a reviewed draft READY for a later explicit publish command.")
+    approve.add_argument("post_id")
+    approve.add_argument("--ledger", default="data/ledger.json")
+    publish = subs.add_parser("publish", help="Publish a reviewed READY Reel through Meta's official API.")
+    publish.add_argument("post_id")
+    publish.add_argument("--draft", required=True)
+    publish.add_argument("--media-url", required=True, help="Public HTTPS MP4 URL that Meta can fetch.")
+    publish.add_argument("--ledger", default="data/ledger.json")
+    publish.add_argument("--confirm-publish", action="store_true", help="Confirm that the actual Reel should be posted now.")
+    return parser
+
+
+def main(argv: list[str] | None = None) -> int:
+    args = _parser().parse_args(argv)
+    try:
+        if args.command == "draft":
+            draft, video = create_draft(day=args.date, ledger_path=args.ledger, output_dir=args.output_dir)
+            print(json.dumps({"id": draft.id, "topic": draft.topic, "caption": draft.caption,
+                              "draft": str(Path(args.output_dir) / f"{draft.id}.json"),
+                              "video": str(video) if video else None,
+                              "status": "IDEA", "published": False}, ensure_ascii=False, indent=2))
+            return 0
+        if args.command == "approve":
+            ledger = ContentLedger(args.ledger)
+            ledger.update_status(args.post_id, "APPROVED")
+            ledger.update_status(args.post_id, "READY")
+            print(f"{args.post_id} is READY. Review the exact video file before publishing.")
+            return 0
+        if args.command == "publish":
+            if load_draft(args.draft).id != args.post_id:
+                raise PipelineError("The post ID does not match the selected draft file.")
+            media_id = publish_draft(draft_path=args.draft, media_url=args.media_url,
+                                     ledger_path=args.ledger, confirm=args.confirm_publish)
+            print(f"Published Instagram media ID: {media_id}")
+            return 0
+    except (PipelineError, RuntimeError, ValueError) as exc:
+        print(f"Stopped safely: {exc}", file=sys.stderr)
+        return 2
+    return 2
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
