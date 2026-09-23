@@ -79,6 +79,22 @@ def test_same_day_reservation_rejected_after_reload(tmp_path):
         ContentLedger(path).reserve(draft(date(2026, 9, 24), topic="A different idea", hook="Completely new hook"))
 
 
+def test_daily_post_types_can_be_reserved_atomically_for_same_day(tmp_path):
+    day = date(2026, 9, 24)
+    posts = [
+        ContentDraft(id=f"post-{day}-{kind}", publish_date=day, pillar="daily",
+                     content_type=kind, language="ro", topic=f"Distinct topic {kind}",
+                     hook=f"Distinct hook {kind}", caption=f"Distinct caption {kind}")
+        for kind in ("meme", "educational", "informative")
+    ]
+    ledger = ContentLedger(tmp_path / "ledger.json")
+    rows = ledger.reserve_batch(posts)
+    assert len(rows) == 3
+    assert {row["content_type"] for row in ledger.list_records()} == {"meme", "educational", "informative"}
+    with pytest.raises(DuplicateDayError):
+        ledger.reserve(posts[0])
+
+
 def test_same_day_reservation_is_atomic_across_processes(tmp_path):
     path = str(tmp_path / "ledger.json")
     day = date(2026, 9, 24).isoformat()

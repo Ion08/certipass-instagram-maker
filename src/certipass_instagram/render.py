@@ -66,17 +66,29 @@ def compose_slide(artwork: Image.Image, *, brand: str, headline: str, body: str 
     overlay = Image.new("RGBA", (size, height), (0, 0, 0, 0))
     draw = ImageDraw.Draw(overlay)
     pad = int(size * 0.075)
-    panel_top = int(height * 0.53)
+    panel_top = int(height * 0.52)
     draw.rounded_rectangle((pad // 2, panel_top, size - pad // 2, height - pad // 2),
-                           radius=int(size * 0.045), fill=(12, 26, 48, 218))
+                           radius=int(size * 0.045), fill=(255, 250, 243, 238),
+                           outline=(220, 213, 241, 245), width=max(2, size // 360))
     brand_font = _font(int(size * 0.035), True)
-    draw.text((pad, int(height * 0.045)), brand, font=brand_font, fill="white",
-              stroke_width=1, stroke_fill=(0, 0, 0, 64))
+    brand_box = draw.textbbox((0, 0), brand, font=brand_font)
+    brand_width = brand_box[2] - brand_box[0]
+    brand_height = brand_box[3] - brand_box[1]
+    brand_y = int(height * 0.045)
+    draw.rounded_rectangle((pad // 2, brand_y - int(size * 0.018),
+                            pad + brand_width + int(size * 0.035),
+                            brand_y + brand_height + int(size * 0.018)),
+                           radius=int(size * 0.025), fill=(231, 222, 250, 238))
+    draw.text((pad, brand_y), brand, font=brand_font, fill="#182B4D")
     if count > 1:
         count_text = f"{index}/{count}"
         box = draw.textbbox((0, 0), count_text, font=brand_font)
-        draw.text((size - pad - (box[2] - box[0]), int(height * 0.045)), count_text, font=brand_font,
-                  fill="white", stroke_width=1, stroke_fill=(0, 0, 0, 64))
+        count_width = box[2] - box[0]
+        count_y = int(height * 0.045)
+        draw.rounded_rectangle((size - pad - count_width - int(size * 0.035), count_y - int(size * 0.018),
+                                size - pad // 2, count_y + (box[3] - box[1]) + int(size * 0.018)),
+                               radius=int(size * 0.025), fill=(218, 238, 250, 238))
+        draw.text((size - pad - count_width, count_y), count_text, font=brand_font, fill="#182B4D")
 
     text_width = size - 2 * pad
     title_size = int(size * 0.077)
@@ -91,7 +103,7 @@ def compose_slide(artwork: Image.Image, *, brand: str, headline: str, body: str 
     line_height = int(title_size * 1.15)
     y = panel_top + int(height * 0.07)
     for line in title_lines:
-        draw.text((pad, y), line, font=title_font, fill="#FFFFFF")
+        draw.text((pad, y), line, font=title_font, fill="#182B4D")
         y += line_height
 
     if body.strip():
@@ -101,7 +113,7 @@ def compose_slide(artwork: Image.Image, *, brand: str, headline: str, body: str 
             raise RenderError("Slide body is too long for an Instagram slide.")
         y += int(height * 0.025)
         for line in body_lines:
-            draw.text((pad, y), line, font=body_font, fill="#E6EDF5")
+            draw.text((pad, y), line, font=body_font, fill="#34445F")
             y += int(height * 0.048)
     return Image.alpha_composite(image, overlay).convert("RGB")
 

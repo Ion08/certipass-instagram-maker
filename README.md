@@ -1,23 +1,25 @@
 # certiPass Instagram Maker
 
-Automatizare pentru postări statice Instagram certiPass.md: postări cu o imagine sau carusele de 4–6 imagini. Fiecare slide final este un fișier PNG 4:5 cu artwork generat de GPT Image 2 și copy românesc redat exact peste artwork. Nu creează Reels, videoclipuri, pagini HTML sau capturi de ecran.
+Automatizare pentru trei postări statice Instagram certiPass.md în fiecare zi: un meme, o postare educativă și una informativă. Fiecare este o imagine PNG 4:5 cu artwork generat de GPT Image 2 și copy românesc redat exact peste artwork. Nu creează Reels, videoclipuri, pagini HTML sau capturi de ecran.
 
 Textul, subiectul și prompturile vizuale sunt pregătite cu Codex CLI autentificat prin ChatGPT. Artwork-ul este generat separat prin OpenRouter, folosind modelul openai/gpt-image-2, iar imaginile rezultate sunt compuse în PNG-uri statice. OpenRouter se plătește separat; abonamentul ChatGPT Plus nu acoperă aceste cereri.
 
 ## Fluxul actual
 
 - verifică surse pentru afirmații educaționale și reguli factuale;
-- cere Codex să redacteze o postare românească și prompturile pentru fiecare slide;
+- cere Codex să redacteze toate cele trei formate într-un singur apel: meme, educativ și informativ;
+- compară subiectele, formulările, personajele și motivele vizuale cu ultimele 90 de postări salvate;
+- păstrează aceeași familie vizuală pastel (ivory, lavandă, albastru pudrat, mentă, piersică și bleumarin), variind personajul, scena și compoziția fiecărei imagini;
 - generează artwork PNG prin OpenRouter;
-- așază textul românesc peste artwork și salvează imaginile 1080×1350;
+- așază textul românesc peste artwork și salvează trei imagini distincte, 1080×1350;
 - ține evidența subiectelor și oferă artefactele pentru revizie;
 - publicarea Meta rămâne dezactivată implicit și cere găzduire publică HTTPS pentru fiecare PNG.
 
 ## Costul imaginilor
 
-Exemplul curent din documentația OpenRouter pentru o imagine 1536×864 la calitate high raportează $0.13; costul variază în funcție de rezoluție și de utilizarea efectivă. Ca ordin de mărime, cinci imagini la acel tarif ar costa aproximativ $0.65 per carusel, sau $19.50 pentru 30 de carusele cu câte cinci slide-uri. Verifică întotdeauna costul afișat în activitatea OpenRouter după o rulare reală.
+Exemplul curent din documentația OpenRouter pentru o imagine 1536×864 la calitate high raportează $0.13; costul variază în funcție de rezoluție și de utilizarea efectivă. Trei imagini la acel tarif ar fi aproximativ $0.39 pe zi sau $11.70 pentru 30 de zile. Verifică activitatea și tariful efectiv în OpenRouter după primele rulări.
 
-Setează o limită de cheltuieli în contul OpenRouter. Workflow-ul produce cel mult șase slide-uri într-o rulare și se oprește când OpenRouter raportează credite insuficiente ori o limită de utilizare.
+Setează o limită de cheltuieli în contul OpenRouter. Workflow-ul produce exact trei imagini într-o rulare și se oprește când OpenRouter raportează credite insuficiente ori o limită de utilizare.
 
 ## Rulare locală
 
@@ -27,13 +29,13 @@ Comenzile sunt: creează și activează un mediu virtual Python, instalează pro
 
 ## GitHub Actions
 
-Workflow-ul zilnic este oprit implicit. Pentru drafturi programate într-un repository privat:
+Workflow-ul zilnic este oprit implicit. Pentru cele trei drafturi zilnice într-un repository privat:
 
 1. Revocă imediat orice cheie OpenRouter pe care ai trimis-o într-o conversație și creează una nouă.
 2. Adaugă cheia nouă ca repository Actions secret OPENROUTER_API_KEY.
 3. Configurează autentificarea Codex/ChatGPT documentată pentru workflow folosind secretul CODEX_AUTH_JSON și mecanismul de rotație existent CODEX_SECRET_WRITE_TOKEN.
 4. Setează repository variable ENABLE_DAILY_DRAFTS=true.
-5. O rulare manuală sau programată va încărca PNG-urile ca artifact privat pentru revizie.
+5. O rulare manuală sau programată va încărca cele trei PNG-uri și fișierele JSON ca artifact privat pentru revizie.
 
 Nu scrie cheia API într-un fișier tracked și nu o pune în URL-uri ori loguri.
 

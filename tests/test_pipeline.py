@@ -73,3 +73,39 @@ def test_create_draft_builds_static_png_carousel_without_any_video(tmp_path, mon
     assert all(path.suffix == ".png" and path.exists() for path in images)
     assert not list((tmp_path / "artifacts").glob("*.mp4"))
     assert len(draft.asset_paths) == 4
+
+
+def test_create_daily_set_renders_three_distinct_static_formats_atomically(tmp_path, monkeypatch):
+    class Page:
+        def __init__(self, url): self.url = url
+        def evidence(self): return {"url": self.url, "title": "test", "accessed_at": "today", "text": "facts"}
+
+    class DailyGenerator:
+        def generate_daily_set(self, **kwargs):
+            day = kwargs["day"]
+            return [
+                ContentDraft(id=f"post-{day}-{kind}", publish_date=day, pillar="daily",
+                             content_type=kind, language="ro", topic=f"Distinct topic for {kind}",
+                             hook=f"A different hook about {kind}", caption=f"Caption specifically for {kind}.",
+                             character=f"Character {kind}", visual_motif=f"Motif {kind}",
+                             slides=(Slide(f"Titlu {kind}", "Text exact", f"Pastel art for {kind}", f"Alt {kind}"),))
+                for kind in ("meme", "educational", "informative")
+            ]
+
+    class FakeImageGenerator:
+        def generate(self, prompt):
+            image = Image.new("RGB", (64, 80), "#ded8f5")
+            stream = BytesIO()
+            image.save(stream, format="PNG")
+            return stream.getvalue()
+
+    monkeypatch.setattr(pipeline, "fetch_snapshot", lambda: [
+        Page("https://www.certipass.md/"), Page("https://docs.python.org/3/tutorial/floatingpoint.html"),
+    ])
+    completed = pipeline.create_daily_set(
+        day=date(2026, 9, 23), ledger_path=tmp_path / "ledger.json",
+        output_dir=tmp_path / "artifacts", generator=DailyGenerator(), image_generator=FakeImageGenerator(),
+    )
+    assert {draft.content_type for draft, _ in completed} == {"meme", "educational", "informative"}
+    assert all(len(images) == 1 and images[0].exists() for _, images in completed)
+    assert len(pipeline.ContentLedger(tmp_path / "ledger.json").list_records()) == 3

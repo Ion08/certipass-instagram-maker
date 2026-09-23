@@ -32,9 +32,12 @@ class ContentDraft:
     topic: str
     hook: str
     caption: str
+    content_type: str = "educational"
     slides: tuple[Slide, ...] = ()
     sources: tuple[Source, ...] = ()
     visual_family: str = "editorial"
+    character: str = ""
+    visual_motif: str = ""
     facts: tuple[str, ...] = ()
     asset_paths: tuple[str, ...] = ()
     media_urls: tuple[str, ...] = ()

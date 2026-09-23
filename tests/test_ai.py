@@ -4,7 +4,8 @@ from pathlib import Path
 
 import pytest
 
-from certipass_instagram.ai import CodexConfig, CodexGenerator, GenerationError, _draft_from_json, _validate_draft
+from certipass_instagram.ai import (CodexConfig, CodexGenerator, GenerationError, _daily_set_prompt,
+                                    _draft_from_json, _validate_daily_set, _validate_draft)
 
 
 def valid_payload(url="https://docs.python.org/3/tutorial/floatingpoint.html"):
@@ -85,3 +86,40 @@ def test_generator_sanitizes_failure_output():
     with pytest.raises(GenerationError) as exc:
         CodexGenerator(runner=runner).generate(day=date(2026, 9, 23), evidence=[])
     assert "private token diagnostic" not in str(exc.value)
+
+
+def test_daily_set_requires_each_type_unique_topic_character_and_motif():
+    evidence = [
+        {"url": "https://docs.python.org/3/tutorial/floatingpoint.html", "title": "Python docs", "accessed_at": "today"},
+        {"url": "https://www.certipass.md/", "title": "certiPass", "accessed_at": "today"},
+    ]
+    base = valid_payload()
+    base["facts"] = []
+    base["sources"] = []
+    base["slides"] = base["slides"][:1]
+    posts = []
+    for content_type, topic in (("meme", "Python operator joke"),
+                                ("educational", "Python exponents"),
+                                ("informative", "How to study with practice")):
+        item = {**base, "content_type": content_type, "topic": topic,
+                "visual_family": "pastel-editorial", "character": f"student {content_type}",
+                "visual_motif": f"motif {content_type}"}
+        item["hook"] = f"Distinct hook for {content_type}"
+        item["caption"] = f"Distinct caption for {content_type}"
+        item["slides"] = [{**base["slides"][0], "headline": f"{content_type} post"}]
+        posts.append(_draft_from_json(item, date(2026, 9, 23)))
+    _validate_daily_set(posts, evidence)
+    assert {draft.id for draft in posts} == {
+        "post-2026-09-23-meme", "post-2026-09-23-educational", "post-2026-09-23-informative"
+    }
+    posts[2] = _draft_from_json({**base, "content_type": "educational", "character": "another",
+                                 "visual_motif": "another", "slides": base["slides"][:1]}, date(2026, 9, 23))
+    with pytest.raises(ValueError, match="one meme"):
+        _validate_daily_set(posts, evidence)
+
+
+def test_daily_prompt_carries_brand_style_and_rotation_history():
+    prompt = _daily_set_prompt(date(2026, 9, 23), [], [{"topic": "past topic", "character": "past student"}])
+    assert "meme, educational, informative" in prompt
+    assert "lavender" in prompt and "past student" in prompt
+    assert "vary topics, hooks" in prompt

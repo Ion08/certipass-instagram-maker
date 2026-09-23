@@ -66,6 +66,59 @@ def create_draft(*, day: date | None = None, ledger_path: str | Path = "data/led
     return draft, image_paths
 
 
+def create_daily_set(*, day: date | None = None, ledger_path: str | Path = "data/ledger.json",
+                     output_dir: str | Path = "artifacts", generator: CodexGenerator | None = None,
+                     image_generator: OpenRouterImageGenerator | None = None
+                     ) -> list[tuple[ContentDraft, list[Path]]]:
+    """Create one meme, one educational post and one informative post for a date."""
+    target_day = day or local_today()
+    ledger = ContentLedger(ledger_path)
+    records = ledger.list_records()
+    recent_history = [
+        {key: str(row.get(key, "")) for key in
+         ("publish_date", "content_type", "topic", "hook", "character", "visual_motif", "caption")}
+        for row in records[-90:]
+    ]
+    pages = fetch_snapshot()
+    if not any(page.url.startswith("https://www.certipass.md/") for page in pages):
+        raise PipelineError("Could not read certiPass.md for current brand/product facts; no daily set was generated.")
+    if not any(page.url.startswith(("https://docs.python.org/", "https://www.sqlite.org/", "https://developer.mozilla.org/"))
+               for page in pages):
+        raise PipelineError("No current technical reference was reachable; no daily set was generated.")
+    drafts = (generator or CodexGenerator()).generate_daily_set(
+        day=target_day, evidence=[page.evidence() for page in pages], recent_history=recent_history,
+    )
+    if len(drafts) != 3 or {draft.content_type for draft in drafts} != {"meme", "educational", "informative"}:
+        raise PipelineError("The daily generator must return one meme, one educational and one informative post.")
+
+    output_dir = Path(output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    image_generator = image_generator or OpenRouterImageGenerator(OpenRouterConfig.from_env())
+    completed: list[tuple[ContentDraft, list[Path]]] = []
+    staged_drafts: list[ContentDraft] = []
+    for draft in drafts:
+        if draft.publish_date != target_day or len(draft.slides) != 1:
+            raise PipelineError("Each daily post must be one static image for the requested date.")
+        art_dir = output_dir / "artwork"
+        art_dir.mkdir(parents=True, exist_ok=True)
+        art_path = art_dir / f"{draft.id}-art-01.png"
+        try:
+            art_path.write_bytes(image_generator.generate(draft.slides[0].image_prompt))
+        except Exception:
+            raise PipelineError(f"Image generation failed for the {draft.content_type} post; nothing was published.") from None
+        image_paths = render_carousel(draft, [art_path], output_dir)
+        draft = ContentDraft.from_dict({**draft.to_dict(), "asset_paths": [str(path) for path in image_paths]})
+        staged_drafts.append(draft)
+        completed.append((draft, image_paths))
+
+    # Reserve the complete three-post package together so a partial daily set cannot enter the history.
+    ledger.reserve_batch(staged_drafts)
+    for draft, _images in completed:
+        path = output_dir / f"{draft.id}.json"
+        path.write_text(json.dumps(draft.to_dict(), ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    return completed
+
+
 def load_draft(path: str | Path) -> ContentDraft:
     try:
         raw = json.loads(Path(path).read_text(encoding="utf-8"))

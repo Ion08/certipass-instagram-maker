@@ -67,7 +67,7 @@ jobs:
             "$HOME/.codex/auth.json" >/dev/null
           printf 'cli_auth_credentials_store = "file"\n' > "$HOME/.codex/config.toml"
 
-      - name: Generate and render static image post
+      - name: Generate daily meme, educational and informative images
         env:
           PYTHONPATH: src
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
@@ -103,7 +103,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: certipass-image-post-draft-${{ github.run_id }}
+          name: certipass-daily-post-set-${{ github.run_id }}
           path: artifacts/
           if-no-files-found: ignore
           retention-days: 30
