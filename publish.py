@@ -1,4 +1,4 @@
-"""Publish the next certiPass carousel through Instagram Login."""
+"""Publish the next certiPass carousel and its first slide as an Instagram Story."""
 
 import json
 import os
@@ -150,6 +150,38 @@ def publish_carousel(day, caption):
     return result["id"]
 
 
+def save_state(state):
+    STATE.write_text(json.dumps(state, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+
+def publish_story(day, entry, state):
+    if entry.get("story_id"):
+        announce(f"Story for day {day:02} is already published: {entry['story_id']}")
+        return
+    if entry.get("story_status") == "uncertain":
+        raise RuntimeError(f"Story for day {day:02} may already be live; check Instagram before retrying")
+    url = image_url(day, 1)
+    check_public_image(url)
+    container = request(f"{IG_USER_ID}/media", {
+        "media_type": "STORIES",
+        "image_url": url,
+    }, method="POST")
+    wait_until_ready(container["id"])
+    # Persist before publishing: an interrupted response must never cause an automatic duplicate.
+    entry["story_status"] = "uncertain"
+    save_state(state)
+    try:
+        result = request(f"{IG_USER_ID}/media_publish", {
+            "creation_id": container["id"]
+        }, method="POST")
+    except RuntimeError as exc:
+        raise RuntimeError(f"Story result uncertain; check Instagram before retrying. {exc}") from exc
+    entry["story_id"] = result["id"]
+    entry["story_status"] = "published"
+    save_state(state)
+    announce(f"Published Story for day {day:02}: media ID {result['id']}")
+
+
 def main():
     global TOKEN
     if not TOKEN or not IG_USER_ID or not MEDIA_BASE_URL:
@@ -167,13 +199,19 @@ def main():
                 hashlib.sha256(original_token.encode("utf-8")).digest()
             )).encrypt(TOKEN.encode("utf-8")) + b"\n")
             state["token_refreshed_at"] = today
-            STATE.write_text(json.dumps(state, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+            save_state(state)
             announce("Instagram access token refreshed securely.")
     else:
         state["token_refreshed_at"] = today
-        STATE.write_text(json.dumps(state, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        save_state(state)
     if state.get("last_published_date") == today:
-        announce(f"Already posted on {today} (Chișinău). Nothing to do.")
+        entry = state["history"][-1]
+        if entry["date"] != today:
+            raise RuntimeError("Publishing history does not match today's date")
+        if entry.get("story_id"):
+            announce(f"Carousel and Story already posted on {today} (Chișinău). Nothing to do.")
+            return
+        publish_story(int(entry["day"]), entry, state)
         return
     day = int(state["next_day"])
     if day > len(posts):
@@ -191,8 +229,10 @@ def main():
         announce(f"Published day {day:02} on Instagram: media ID {media_id}")
     state["next_day"] = day + 1
     state["last_published_date"] = today
-    state.setdefault("history", []).append({"day": day, "date": today, "media_id": media_id})
-    STATE.write_text(json.dumps(state, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    entry = {"day": day, "date": today, "media_id": media_id}
+    state.setdefault("history", []).append(entry)
+    save_state(state)
+    publish_story(day, entry, state)
 
 
 if __name__ == "__main__":
