@@ -1,0 +1,362 @@
+[
+  {
+    "day": 1,
+    "caption": "Un singur număr schimbă litera pe care o citești. Alege răspunsul înainte să glisezi, apoi verifică explicația. Dacă numele ar fi „Ion”, ce ar afișa nume[1]? Scrie litera în comentarii."
+  },
+  {
+    "day": 2,
+    "caption": "Când întrebarea cere un elev, iar tu aduci toată clasa. 😅 SELECT alege coloanele; WHERE filtrează rândurile. Trimite caruselul colegului care verifică mereu interogarea după ce apasă Run."
+  },
+  {
+    "day": 3,
+    "caption": "DNS este mai ușor de înțeles când urmărești pașii: nume de domeniu, răspuns DNS, adresă IP. E o piesă din traseu, nu întregul internet. Salvează schema pentru recapitularea la Networking."
+  },
+  {
+    "day": 4,
+    "caption": "Pentru o sesiune scurtă, încearcă această împărțire și adapteaz-o la ritmul tău. Scopul este să închei cu un lucru pe care îl poți explica. Urmărește certiPass.md pentru alte idei de practică."
+  },
+  {
+    "day": 5,
+    "caption": "Înainte să începi, separă pregătirea de examenul propriu-zis. certiPass.md este o platformă independentă de pregătire; condițiile de înscriere la examen se verifică la centrul ales. Salvează această diferență pentru planul tău."
+  },
+  {
+    "day": 6,
+    "caption": "Imaginează-ți un document încă nesalvat și unul deja salvat. Diferența dintre RAM și stocare explică de ce butonul Save contează. Spune-ne ce comparație ai folosi ca să explici asta unui prieten."
+  },
+  {
+    "day": 7,
+    "caption": "Colecția de taburi este impresionantă. Acum îi lipsește doar un răspuns scris. 😄 Trimite postarea prietenului cu un browser care arată ca o bibliotecă și începeți fiecare cu câte un exercițiu."
+  },
+  {
+    "day": 8,
+    "caption": "O interogare devine mai clară dacă separi două întrebări: ce vreau să văd și ce înregistrări caut? Încearcă să formulezi întâi răspunsurile în română. Salvează caruselul ca reper pentru SQL."
+  },
+  {
+    "day": 9,
+    "caption": "Ordinea operațiilor nu dispare când scrii cod. Parantezele schimbă ce se calculează prima dată. Lasă în comentarii un exemplu scurt în care o pereche de paranteze schimbă rezultatul."
+  },
+  {
+    "day": 10,
+    "caption": "Alege zona în care vrei să înțelegi ceva concret săptămâna aceasta. Poți explora direcțiile de pregătire de pe certiPass.md și apoi să-ți alegi primul subiect. Intră din linkul din bio."
+  },
+  {
+    "day": 11,
+    "caption": "O greșeală explicată îți lasă o întrebare bună pentru următoarea sesiune. Încearcă fișa cu un exercițiu de azi și revino la el mai târziu. Salvează cele trei întrebări pentru caietul tău de practică."
+  },
+  {
+    "day": 12,
+    "caption": "Routerul a început deja să creadă că el a greșit. Uneori primul indiciu este chiar în bara de adrese. Distribuie colegului care a încercat toate soluțiile înainte să observe litera în plus."
+  },
+  {
+    "day": 13,
+    "caption": "Numele sunt bune pentru oameni; identificatorii ajută relațiile dintre date. Când proiectezi un tabel, întreabă-te ce câmp poate identifica fiecare rând fără ambiguitate. Salvează ideea pentru următoarea diagramă."
+  },
+  {
+    "day": 14,
+    "caption": "Ce vezi pe ecran și ce tip are valoarea sunt două întrebări diferite. Citește explicația, apoi încearcă să prezici ce se întâmplă dacă introduci text în loc de cifre. Ce eroare ai investiga?"
+  },
+  {
+    "day": 15,
+    "caption": "Când un fișier nu se lasă modificat, verifică drepturile înainte să presupui că este defect. Citirea, scrierea și execuția descriu acțiuni diferite. Salvează cardul pentru recapitularea permisiunilor."
+  },
+  {
+    "day": 16,
+    "caption": "Acesta este un mic exercițiu de autoevaluare: explică pe scurt, apoi verifică ce ai omis. Nu trebuie să sune ca un manual. Alege DNS, RAM sau o buclă Python și încearcă în comentarii."
+  },
+  {
+    "day": 17,
+    "caption": "Funcția a făcut tot traseul și s-a întors cu mâinile goale. 😅 În Python, o funcție care se încheie fără return explicit întoarce None. Trimite meme-ul celui care a uitat măcar o dată rezultatul acasă."
+  },
+  {
+    "day": 18,
+    "caption": "Când citești o problemă de rețelistică, observă dacă este vorba de traseul între rețele sau de legătura locală. Diferența ajută la alegerea conceptului. Salvează comparația pentru fișa ta de Networking."
+  },
+  {
+    "day": 19,
+    "caption": "Aceeași tabelă poate produce două numărători diferite. Citește cu atenție ce se află în paranteze. Scrie în comentarii când ai alege să numeri rândurile și când ai număra doar valorile completate."
+  },
+  {
+    "day": 20,
+    "caption": "O sesiune poate începe cu o singură întrebare bine aleasă. Explorează certiPass.md și caută subiectul la care ai nevoie de practică. Linkul din bio te duce la platformă."
+  },
+  {
+    "day": 21,
+    "caption": "Uneori problema nu este ce ai scris, ci unde începe rândul. 😅 Verifică indentarea când un bloc nu se comportă cum te aștepți. Distribuie colegului care a negociat cu un spațiu timp de zece minute."
+  },
+  {
+    "day": 22,
+    "caption": "O limită exclusă poate produce un exercițiu rezolvat greșit, chiar dacă ideea buclei este bună. Scrie valorile pe hârtie înainte să calculezi rezultatul. Salvează exemplul pentru următoarea recapitulare."
+  },
+  {
+    "day": 23,
+    "caption": "Gândește relația ca pe o trimitere: această comandă aparține acelui client. Încearcă să desenezi legătura dintre două tabele înainte să scrii interogarea. Salvează caruselul pentru exercițiile despre relații."
+  },
+  {
+    "day": 24,
+    "caption": "O copie de rezervă îți este utilă când poți recupera ceea ce ai nevoie. Exersează restaurarea cu un fișier simplu și verifică rezultatul. Trimite această idee unui prieten care își ține toate proiectele într-un singur loc."
+  },
+  {
+    "day": 25,
+    "caption": "Un site poate folosi HTTPS și totuși să te inducă în eroare. Privește adresa și cererea, nu doar lacătul. Salvează această distincție pentru următoarea întrebare despre securitate."
+  },
+  {
+    "day": 26,
+    "caption": "Când planul era punctual, dar interogarea are ambiții de grup. 😅 Exersează comenzile de modificare pe date de test și verifică mai întâi rândurile vizate. Trimite meme-ul colegului care citește WHERE de două ori."
+  },
+  {
+    "day": 27,
+    "caption": "Unitățile pot schimba sensul unui număr. Când citești viteze sau dimensiuni, uită-te atent la simbol. Salvează cardul ca să ai la îndemână diferența dintre bit și byte."
+  },
+  {
+    "day": 28,
+    "caption": "Încearcă să transformi un exercițiu pe care l-ai urmărit într-unul creat de tine. E o ocazie bună să observi ce parte ai înțeles și ce parte ai memorat. Urmărește-ne pentru alte provocări scurte."
+  },
+  {
+    "day": 29,
+    "caption": "Listele și dicționarele pot arăta ca două colecții, dar accesul la valori se face diferit. Gândește-te ce reprezintă expresia din paranteze. Ce altă cheie ai adăuga pentru acest elev?"
+  },
+  {
+    "day": 30,
+    "caption": "Prima etapă se încheie cu o mică recapitulare. Alege conceptul pe care îl poți explica acum mai clar și lasă un exemplu. Răspunsurile voastre ne ajută să alegem ce aprofundăm mai departe."
+  },
+  {
+    "day": 31,
+    "caption": "Când întrebarea cere un rezultat pentru fiecare categorie, caută ideea de grupare. Desenează mai întâi câte o cutie pentru fiecare oraș. Salvează exemplul și încearcă apoi să grupezi după altă coloană."
+  },
+  {
+    "day": 32,
+    "caption": "Laptopul este pregătit pentru ședința foto. Noi mai avem un mic capitol. Trimite meme-ul prietenului care își organizează biroul impecabil înainte să înceapă lecția și propune-i un exercițiu împreună."
+  },
+  {
+    "day": 33,
+    "caption": "O memorie temporară a răspunsurilor poate evita repetarea aceleiași căutări. La DNS, observă și durata pentru care răspunsul rămâne valabil. Salvează caruselul lângă explicația despre rezolvarea numelor."
+  },
+  {
+    "day": 34,
+    "caption": "Poți folosi o întrebare veche ca punct de pornire pentru o sesiune nouă. Încearcă să refaci pașii, apoi compară-i cu soluția. Ce exercițiu ai vrea să poți rezolva din nou fără ajutor?"
+  },
+  {
+    "day": 35,
+    "caption": "La o secțiune de șir, citește separat începutul și limita finală. Marchează pozițiile literelor înainte să alegi rezultatul. Scrie în comentarii ce ai obține pentru text[0:2]."
+  },
+  {
+    "day": 36,
+    "caption": "Dacă vrei să înțelegi cum se leagă partea hardware de sistemul de operare, aceasta poate fi direcția ta de început. Explorează Device C&M pe certiPass.md și alege primul capitol din platformă."
+  },
+  {
+    "day": 37,
+    "caption": "Uneori organizarea sesiunii are propriul ei sezon complet. 😅 Alege o melodie, apoi o întrebare. Trimite caruselul prietenului care are playlist pentru orice materie și vedeți cine începe primul."
+  },
+  {
+    "day": 38,
+    "caption": "Înainte să scrii JOIN, trasează legăturile care respectă condiția. Apoi urmărește ce rânduri au o potrivire. Salvează caruselul pentru exercițiile în care rezultatul are mai puține rânduri decât te așteptai."
+  },
+  {
+    "day": 39,
+    "caption": "Două semne apropiate vizual, două operații diferite. La citirea codului, spune în minte „atribuie” sau „compară”. Scrie o condiție scurtă care folosește corect operatorul de egalitate."
+  },
+  {
+    "day": 40,
+    "caption": "Caută mai întâi scara problemei: în interiorul unei rețele sau între rețele? Comparația descrie rolurile de bază; echipamentele moderne pot combina funcții. Salvează schema pentru recapitulare."
+  },
+  {
+    "day": 41,
+    "caption": "După o simulare, încearcă să grupezi greșelile. Fiecare grup îți sugerează un alt pas pentru următoarea sesiune. Salvează lista și alege o singură categorie pe care vrei să o lucrezi întâi."
+  },
+  {
+    "day": 42,
+    "caption": "Când pauza apare înaintea primei întrebări. 😅 Încearcă o sesiune scurtă cu notificările oprite și vezi cum ți se potrivește. Trimite meme-ul prietenului care trimite clipuri exact când începeți să învățați."
+  },
+  {
+    "day": 43,
+    "caption": "Un mesaj de eroare îți oferă un indiciu. Când adaugi tratarea excepțiilor, încearcă să numești problema pe care o anticipezi. Salvează ideea și caută un exemplu cu o conversie numerică nereușită."
+  },
+  {
+    "day": 44,
+    "caption": "Faptul că vezi astăzi aceeași ordine nu înseamnă că interogarea o cere. Uită-te după clauza care descrie sortarea. Ce coloană ai folosi ca să afișezi elevii în ordine alfabetică?"
+  },
+  {
+    "day": 45,
+    "caption": "O notificare de actualizare merită citită, nu tratată ca un obstacol automat. Pentru dispozitivul tău, folosește sursele oficiale și instrucțiunile sistemului. Salvează mini-lista pentru următoarea actualizare."
+  },
+  {
+    "day": 46,
+    "caption": "O rețea devine mai ușor de urmărit când poți explica rolul fiecărei piese. Explorează secțiunea Networking și pornește de la un concept pe care vrei să-l clarifici. Găsești platforma în linkul din bio."
+  },
+  {
+    "day": 47,
+    "caption": "Ai verificat logica, parantezele și toate variabilele. Lipsea doar fișierul potrivit. Trimite caruselul cuiva care a reparat o problemă într-o copie pe care programul nici nu o folosea."
+  },
+  {
+    "day": 48,
+    "caption": "Imaginează-ți o clădire cu mai multe servicii la aceeași adresă. Este doar o analogie de început, dar te ajută să separi gazda de serviciul căutat. Salvează caruselul pentru întrebările despre porturi."
+  },
+  {
+    "day": 49,
+    "caption": "Două nume pot arăta spre același obiect. Desenează săgețile înainte să alegi rezultatul. Pentru o listă simplă, ce diferență ar face b = a.copy()? Scrie ce ai testa."
+  },
+  {
+    "day": 50,
+    "caption": "Un plan util ține cont și de zilele aglomerate. Încearcă să stabilești un minim realist și un obiectiv pentru timpul liber. Salvează ideea și adapteaz-o la săptămâna ta."
+  },
+  {
+    "day": 51,
+    "caption": "Când apare o agregare, întreabă-te ce anume vrei să filtrezi. Un elev individual sau o categorie întreagă? Salvează caruselul și desenează traseul rânduri → grupuri → rezultat."
+  },
+  {
+    "day": 52,
+    "caption": "Uneori ai nevoie de o întrebare mai mică înainte să ai nevoie de o doză mare de motivație. 😅 Trimite caruselul colegului cu care poți începe o sesiune de practică de zece minute."
+  },
+  {
+    "day": 53,
+    "caption": "Când citești specificațiile unui calculator, evită să pui toate componentele în aceeași categorie. Fiecare are un rol. Salvează comparația și adaugă lângă ea rolul unității de stocare."
+  },
+  {
+    "day": 54,
+    "caption": "Citește operatorul ca pe o regulă, nu ca pe o decorație între două expresii. Acum schimbă and cu or și încearcă din nou. Ce rezultat ai obține în acel caz?"
+  },
+  {
+    "day": 55,
+    "caption": "Un obiectiv mic îți arată mai clar când ai terminat sesiunea. Alege o regulă și un exemplu pentru astăzi. Scrie în comentarii versiunea concretă a unui obiectiv care ți se pare prea mare."
+  },
+  {
+    "day": 56,
+    "caption": "Dacă întrebările despre tabele îți stârnesc curiozitatea, începe cu un exemplu simplu. Explorează Database pe certiPass.md și caută conceptul pe care vrei să-l exersezi. Intră din linkul din bio."
+  },
+  {
+    "day": 57,
+    "caption": "Când diagnosticul ajunge la nivel avansat înainte să ajungă la portul de rețea. 😅 Distribuie meme-ul colegului care verifică mereu cablurile primul. De data aceasta merită să aibă dreptate."
+  },
+  {
+    "day": 58,
+    "caption": "Sortarea este o parte a cerinței. Dacă două rânduri au același scor, gândește-te cum vrei să le ordonezi între ele. Salvează cardul pentru întrebările în care contează primul rezultat."
+  },
+  {
+    "day": 59,
+    "caption": "Lungimea și ultimul index nu sunt același număr. Compară această întrebare cu mini-quizul despre indexarea de la zero. Ce lungime are „Python” și care este ultimul său index?"
+  },
+  {
+    "day": 60,
+    "caption": "Am trecut prin mai multe tipuri de probleme. Acum vrem întrebarea ta: ce concept încă pare neclar și ce exemplu te-ar ajuta? Lasă-l în comentarii și salvează caruselele pe care vrei să le revezi."
+  },
+  {
+    "day": 61,
+    "caption": "O funcție poate afișa ceva fără să întoarcă acel lucru. Urmărește ce folosește programul mai departe, nu doar ce apare pe ecran. Salvează comparația pentru exercițiile cu funcții."
+  },
+  {
+    "day": 62,
+    "caption": "Un exemplu reușit este un început bun. Apoi vin alte date, alte cazuri și surprizele. 😅 Trimite meme-ul colegului care încearcă mereu și valoarea pe care nimeni nu s-a gândit să o introducă."
+  },
+  {
+    "day": 63,
+    "caption": "Nu orice adresă reprezintă un calculator aflat la distanță. Loopback apare des în dezvoltare și diagnostic. Salvează exemplul și compară-l cu o adresă a unui dispozitiv din rețeaua locală."
+  },
+  {
+    "day": 64,
+    "caption": "Într-un exercițiu, un singur cuvânt poate schimba criteriul de alegere. Încearcă să reformulezi cerința înainte să privești variantele. Salvează această listă pentru următoarea sesiune de întrebări."
+  },
+  {
+    "day": 65,
+    "caption": "În SQL, lipsa unei valori cere o atenție specială. Nu o trata automat ca pe un șir gol sau ca pe un număr. Ce ai folosi pentru a selecta rândurile care au email completat?"
+  },
+  {
+    "day": 66,
+    "caption": "Indexare, condiții sau funcții: alege o întrebare concretă pentru următoarea sesiune. Explorează pregătirea Python pe certiPass.md și începe de la locul în care ai nevoie de claritate. Link în bio."
+  },
+  {
+    "day": 67,
+    "caption": "Salvările sunt un început. Următorul pas este să alegi o postare și să lucrezi cu ea. 😅 Trimite meme-ul prietenului cu o colecție impresionantă de „de revăzut” și alegeți fiecare câte una."
+  },
+  {
+    "day": 68,
+    "caption": "Când mai multe operații formează un singur pas logic, tranzacțiile devin importante. Desenează ce ar trebui să rămână împreună înainte să urmărești comenzile. Salvează cardul pentru recapitularea SQL."
+  },
+  {
+    "day": 69,
+    "caption": "Parantezele îți dau un indiciu despre tipul colecției. Încearcă să prezici ce se întâmplă când vrei să înlocuiești primul element. Scrie în comentarii ce variantă ai alege pentru o colecție pe care o modifici."
+  },
+  {
+    "day": 70,
+    "caption": "Dacă un fișier dispare, întrebarea este ce versiune mai poți recupera. Verifică istoricul și regulile serviciului pe care îl folosești. Salvează această diferență pentru proiectele pe care nu vrei să le pierzi."
+  },
+  {
+    "day": 71,
+    "caption": "Fă o listă după instrucțiunile centrului la care susții examenul. Detaliile administrative diferă, așa că verifică sursa primită de la organizator. Salvează caruselul și completează-l cu propriile cerințe."
+  },
+  {
+    "day": 72,
+    "caption": "Când toate întrebările sunt confortabile, verifică și lista cu subiectele amânate. 😅 Alege un exemplu mic din capitolul pe care îl tot ocolești. Trimite meme-ul cuiva care are propriul „colț” de materie."
+  },
+  {
+    "day": 73,
+    "caption": "Mutabilitatea descrie obiectul, nu cât de des îi schimbi numele. Urmărește ce se întâmplă cu aceeași listă atunci când adaugi un element. Salvează exemplul pentru comparația dintre tipurile de date."
+  },
+  {
+    "day": 74,
+    "caption": "Modul de deschidere schimbă ce se întâmplă cu fișierul. Citește litera înainte să urmărești operația. Ce mod ai investiga dacă vrei să adaugi conținut la final? Scrie răspunsul tău."
+  },
+  {
+    "day": 75,
+    "caption": "Un rezultat de diagnostic trebuie citit în context. Gândește-te ce protocol folosește testul și ce serviciu vrei de fapt să verifici. Salvează distincția pentru exercițiile de depanare."
+  },
+  {
+    "day": 76,
+    "caption": "Caruselul poate fi începutul unei întrebări bune. Dacă vrei să continui cu pregătirea, explorează certiPass.md și alege un subiect pentru sesiunea de azi. Găsești accesul la platformă în bio."
+  },
+  {
+    "day": 77,
+    "caption": "Ai descompus algoritmul, ai explicat toate variabilele și ai găsit o singură paranteză. 😅 Trimite caruselul prietenului care vede din prima caracterul pe care tu îl cauți de zece minute."
+  },
+  {
+    "day": 78,
+    "caption": "Privește ce coloane ai selectat: unicitatea se aplică întregului rând rezultat. Încearcă să compari o coloană selectată cu două coloane selectate. Salvează regula pentru întrebările despre duplicate."
+  },
+  {
+    "day": 79,
+    "caption": "Cuvântul dintr-un șir nu îi schimbă automat tipul. Privește ghilimelele înainte să alegi răspunsul. Acum gândește-te ce ar întoarce bool(\"\") și explică de ce în comentarii."
+  },
+  {
+    "day": 80,
+    "caption": "Exersează gestionarea timpului în condiții apropiate de formatul pe care îl vei avea. Nu toate examenele permit aceleași acțiuni. Verifică regulile, apoi testează o strategie de revenire în pregătire."
+  },
+  {
+    "day": 81,
+    "caption": "Când un dispozitiv nu funcționează cum te aștepți, driverul poate fi una dintre piesele de verificat. Urmează documentația producătorului pentru modelul tău. Salvează rolul driverului în schema calculatorului."
+  },
+  {
+    "day": 82,
+    "caption": "Când teoria și reflexele încă negociază. Un mic meme pentru pauza dintre două capitole de rețele. Trimite-l unui coleg și întreabă-l cum ar explica diferența dintre o legătură cu fir și una wireless."
+  },
+  {
+    "day": 83,
+    "caption": "O adresă are sens în contextul rețelei din care face parte. De aceea, două locuințe pot folosi aceeași adresă privată fără să fie același dispozitiv. Salvează exemplul pentru recapitularea adresării."
+  },
+  {
+    "day": 84,
+    "caption": "Încearcă o fișă în două coloane pentru perechea care te încurcă: RAM/SSD, print/return sau WHERE/HAVING. Completează fiecare coloană cu propriile cuvinte. Ce pereche ai alege pentru prima fișă?"
+  },
+  {
+    "day": 85,
+    "caption": "Revino la diferența dintre numărarea rândurilor și numărarea valorilor dintr-o coloană. Aici cerința se referă la toate rândurile. Poți inventa un exemplu în care COUNT(email) ar avea alt rezultat?"
+  },
+  {
+    "day": 86,
+    "caption": "În loc să pornești de la o listă imensă, alege o întrebare la care vrei să răspunzi mai sigur. Explorează platforma și lucrează subiectul ales. Linkul din bio este punctul de pornire."
+  },
+  {
+    "day": 87,
+    "caption": "Recitarea mesajului nu a fost suficientă. 😅 Următorul pas este să urmărești locul și contextul problemei. Trimite meme-ul prietenului care transformă fiecare mesaj de eroare într-o investigație serioasă."
+  },
+  {
+    "day": 88,
+    "caption": "Absența unui mesaj de eroare nu dovedește că ai rezolvat cerința. Compară rezultatul cu un exemplu calculat de tine. Salvează diferența și folosește-o când verifici un exercițiu de programare."
+  },
+  {
+    "day": 89,
+    "caption": "Suntem aproape de finalul seriei. Alege unul dintre cele patru concepte și explică-l unui coleg în propriile cuvinte. Trimite-i caruselul și comparați exemplele, apoi reveniți la postarea care vă trebuie."
+  },
+  {
+    "day": 90,
+    "caption": "Seria se încheie, dar poți continua cu un subiect bine ales. Intră pe certiPass.md pentru pregătire și urmărește pagina pentru următoarele explicații. Spune-ne și ce temă ai vrea în seria următoare."
+  }
+]
