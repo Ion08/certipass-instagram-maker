@@ -89,7 +89,7 @@ def request(path, params=None, method="GET"):
 
 
 def image_url(day, number):
-    return f"{MEDIA_BASE_URL}/day-{day:03}/{number:02}.jpg"
+    return f"{MEDIA_BASE_URL}/day-{day:03}-{number:02}.jpg"
 
 
 def check_public_image(url):
