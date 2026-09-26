@@ -5,6 +5,12 @@ on:
     - cron: '0 18 * * *'
       timezone: 'Europe/Chisinau'
   workflow_dispatch:
+    inputs:
+      correct_day_1_story:
+        description: "Publish corrected portrait Story frames for day 1 only"
+        type: boolean
+        required: false
+        default: false
 
 permissions:
   contents: write
@@ -34,6 +40,7 @@ jobs:
           IG_USER_ID: ${{ vars.IG_USER_ID }}
           MEDIA_BASE_URL: ${{ vars.MEDIA_BASE_URL }}
           META_GRAPH_VERSION: v26.0
+          CORRECT_DAY_1_STORY: ${{ inputs.correct_day_1_story }}
         run: python publish.py
       - name: Save publishing history
         if: always()
