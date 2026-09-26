@@ -1,6 +1,6 @@
 # certiPass.md — 90 de postări Instagram
 
-Acest repository publică **un carusel cu două imagini pe zi**, la **18:00, ora Chișinăului**. Butonul **Actions → Post today / Daily 18:00 → Run workflow** publică următoarea zi imediat. Dacă ai publicat deja în ziua curentă, butonul nu dublează postarea.
+Acest repository publică **un carusel cu două imagini și un Story pe zi**, la **18:00, ora Chișinăului**. Butonul **Actions → Post today / Daily 18:00 → Run workflow** publică următoarea zi imediat. Dacă ai publicat deja caruselul în ziua curentă, butonul publică doar Story-ul lipsă. Dacă ambele sunt publicate, nu le dublează.
 
 ## Configurare înainte de prima postare
 
@@ -15,8 +15,8 @@ Tokenul trebuie să fie **long-lived** și neexpirat când îl instalezi. Workfl
 ## Cum funcționează
 
 - `data/posts.json` conține descrierile celor 90 de zile, în ordinea din documentul campaniei.
-- `data/state.json` reține ziua următoare și istoricul. Workflow-ul îl actualizează după publicare.
-- Dacă un job se reia după ce Instagram a publicat deja, programul verifică descrierile recente și evită dublarea.
+- `data/state.json` reține ziua următoare, caruselul și Story-ul fiecărei zile. Story-ul folosește prima imagine a caruselului (`day-XXX-01.jpg`). Workflow-ul actualizează istoricul după fiecare publicare.
+- Dacă un job se reia după ce Instagram a publicat deja, programul verifică descrierile recente și evită dublarea caruselului. Story-ul are propriul ID și nu se republică atunci când există deja. Dacă răspunsul Meta pentru Story este incert, programul oprește relansarea Story-ului până la verificare manuală.
 - Programarea este zilnică la 18:00 în `Europe/Chisinau`; GitHub Actions poate porni uneori cu întârziere.
 - Pentru a opri automatizarea, schimbă `PUBLISH_ENABLED` la `false`. Butonul manual rămâne disponibil.
 
