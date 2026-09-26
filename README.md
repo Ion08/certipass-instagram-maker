@@ -5,8 +5,8 @@ Acest repository publică **un carusel cu două imagini pe zi**, la **18:00, ora
 ## Configurare înainte de prima postare
 
 1. În **Settings → Secrets and variables → Actions → Secrets**, adaugă `META_ACCESS_TOKEN`: tokenul Instagram User obținut prin **Instagram API with Instagram Login**, cu `instagram_business_basic` și `instagram_business_content_publish`. Nu îl scrie în README, cod sau chat.
-2. În aceeași pagină, la **Variables**, adaugă `IG_USER_ID` (ID-ul numeric al contului Instagram) și `MEDIA_BASE_URL` (adresa publică a folderului cu imaginile JPEG, fără `/` final). Exemplu: `https://raw.githubusercontent.com/OWNER/PUBLIC-ASSET-REPO/main/images`.
-3. Imaginile trebuie să existe public la `MEDIA_BASE_URL/day-001/01.jpg`, `.../02.jpg` până la `day-090/02.jpg`. Meta descarcă imaginile de la aceste adrese când creează postarea. Repository-ul acesta poate rămâne privat.
+2. În aceeași pagină, la **Variables**, adaugă `IG_USER_ID` (ID-ul numeric al contului Instagram) și `MEDIA_BASE_URL` (adresa publică a folderului cu imaginile JPEG, fără `/` final): `https://raw.githubusercontent.com/Ion08/certipass-instagram-maker/main/images`.
+3. Imaginile trebuie să existe public la `MEDIA_BASE_URL/day-001-01.jpg`, `...-02.jpg` până la `day-090-02.jpg`. Meta descarcă imaginile de la aceste adrese când creează postarea.
 4. Deschide **Actions → Post today / Daily 18:00 → Run workflow** pentru prima postare. Verifică rezultatul în Instagram și în sumarul workflow-ului.
 5. Când vrei să înceapă publicarea zilnică, setează variabila `PUBLISH_ENABLED` la `true`. Până atunci, programarea zilnică nu publică nimic.
 
