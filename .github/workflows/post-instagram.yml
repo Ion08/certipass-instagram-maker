@@ -1,0 +1,45 @@
+name: Post today / Daily 18:00
+
+on:
+  schedule:
+    - cron: '0 18 * * *'
+      timezone: 'Europe/Chisinau'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: certipass-instagram-publishing
+  cancel-in-progress: false
+
+jobs:
+  post:
+    if: github.event_name == 'workflow_dispatch' || vars.PUBLISH_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Publish the next unpublished carousel
+        env:
+          META_ACCESS_TOKEN: ${{ secrets.META_ACCESS_TOKEN }}
+          IG_USER_ID: ${{ vars.IG_USER_ID }}
+          MEDIA_BASE_URL: ${{ vars.MEDIA_BASE_URL }}
+          META_GRAPH_VERSION: v26.0
+        run: python publish.py
+      - name: Save publishing history
+        run: |
+          if git diff --quiet -- data/state.json; then
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/state.json
+          git commit -m 'Record Instagram post'
+          git push origin HEAD:main
