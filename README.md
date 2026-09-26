@@ -10,6 +10,8 @@ Acest repository publică **un carusel cu două imagini pe zi**, la **18:00, ora
 4. Deschide **Actions → Post today / Daily 18:00 → Run workflow** pentru prima postare. Verifică rezultatul în Instagram și în sumarul workflow-ului.
 5. Când vrei să înceapă publicarea zilnică, setează variabila `PUBLISH_ENABLED` la `true`. Până atunci, programarea zilnică nu publică nimic.
 
+Tokenul trebuie să fie **long-lived** și neexpirat când îl instalezi. Workflow-ul îl reînnoiește după 30 de zile și păstrează versiunea nouă criptată în `data/token.enc`; cheia este derivată din secretul inițial, care rămâne în GitHub Secrets. Nu modifica secretul inițial fără să refaci și tokenul criptat.
+
 ## Cum funcționează
 
 - `data/posts.json` conține descrierile celor 90 de zile, în ordinea din documentul campaniei.
