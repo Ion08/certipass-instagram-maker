@@ -11,12 +11,6 @@ Acest repository publică **un carusel cu două imagini pe zi**, la **18:00, ora
 
 Tokenul long-lived se reînnoiește după 30 de zile și versiunea nouă se păstrează criptată în `data/token.enc`; cheia provine din secretul inițial din GitHub Secrets.
 
-## Story
-
-Automatizarea **nu publică fotografii în Story**. Cerința este să distribui postarea din feed în Story, cu postarea apăsabilă. Acțiunea **„Distribuie în poveste”** se face din aplicația Instagram; API-ul oficial folosit aici nu oferă această acțiune. Pentru fiecare postare: deschide caruselul pe Instagram → apasă pictograma de distribuire → **Adaugă în poveste** → **Distribuie**.
-
-Fișierele verticale `*-story.jpg` create anterior nu sunt folosite de automatizare.
-
 ## Cum funcționează
 
 - `data/posts.json` conține descrierile celor 90 de zile.
