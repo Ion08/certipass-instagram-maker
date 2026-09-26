@@ -4,17 +4,21 @@ import json
 import os
 import sys
 import time
-from datetime import datetime
+import base64
+import hashlib
+from datetime import date, datetime
 from pathlib import Path
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 from zoneinfo import ZoneInfo
+from cryptography.fernet import Fernet, InvalidToken
 
 
 ROOT = Path(__file__).resolve().parent
 MANIFEST = ROOT / "data" / "posts.json"
 STATE = ROOT / "data" / "state.json"
+TOKEN_FILE = ROOT / "data" / "token.enc"
 TZ = ZoneInfo("Europe/Chisinau")
 GRAPH_VERSION = os.environ.get("META_GRAPH_VERSION", "v26.0")
 GRAPH = f"https://graph.instagram.com/{GRAPH_VERSION}"
@@ -29,6 +33,35 @@ def announce(message):
     if summary:
         with open(summary, "a", encoding="utf-8") as stream:
             stream.write(message + "\n\n")
+
+
+def cipher():
+    key = base64.urlsafe_b64encode(hashlib.sha256(TOKEN.encode("utf-8")).digest())
+    return Fernet(key)
+
+
+def load_current_token():
+    if not TOKEN_FILE.exists():
+        return TOKEN
+    try:
+        return cipher().decrypt(TOKEN_FILE.read_bytes().strip()).decode("utf-8")
+    except (InvalidToken, UnicodeError) as exc:
+        raise RuntimeError("Saved token cannot be decrypted; check META_ACCESS_TOKEN") from exc
+
+
+def refresh_token(current_token):
+    url = "https://graph.instagram.com/refresh_access_token?" + urlencode({
+        "grant_type": "ig_refresh_token",
+        "access_token": current_token,
+    })
+    try:
+        with urlopen(Request(url, headers={"User-Agent": "certiPass-instagram-publisher/1.0"}), timeout=35) as response:
+            result = json.load(response)
+            if not result.get("access_token"):
+                raise RuntimeError("Meta returned no refreshed token")
+            return result["access_token"]
+    except HTTPError as exc:
+        raise RuntimeError(f"Meta token refresh failed (HTTP {exc.code}); reauthorize before it expires") from exc
 
 
 def request(path, params=None, method="GET"):
@@ -118,11 +151,27 @@ def publish_carousel(day, caption):
 
 
 def main():
+    global TOKEN
     if not TOKEN or not IG_USER_ID or not MEDIA_BASE_URL:
         raise RuntimeError("Set META_ACCESS_TOKEN, IG_USER_ID and MEDIA_BASE_URL in GitHub settings")
     posts = json.loads(MANIFEST.read_text(encoding="utf-8"))
     state = json.loads(STATE.read_text(encoding="utf-8"))
     today = datetime.now(TZ).date().isoformat()
+    original_token = TOKEN
+    TOKEN = load_current_token()
+    if state.get("token_refreshed_at"):
+        token_age = (date.fromisoformat(today) - date.fromisoformat(state["token_refreshed_at"])).days
+        if token_age >= 30:
+            TOKEN = refresh_token(TOKEN)
+            TOKEN_FILE.write_bytes(Fernet(base64.urlsafe_b64encode(
+                hashlib.sha256(original_token.encode("utf-8")).digest()
+            )).encrypt(TOKEN.encode("utf-8")) + b"\n")
+            state["token_refreshed_at"] = today
+            STATE.write_text(json.dumps(state, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+            announce("Instagram access token refreshed securely.")
+    else:
+        state["token_refreshed_at"] = today
+        STATE.write_text(json.dumps(state, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     if state.get("last_published_date") == today:
         announce(f"Already posted on {today} (Chișinău). Nothing to do.")
         return
