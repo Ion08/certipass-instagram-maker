@@ -1,4 +1,4 @@
-"""Publish the next certiPass carousel and its first slide as an Instagram Story."""
+"""Publish one certiPass carousel and its two portrait Story frames each day."""
 
 import json
 import os
@@ -92,6 +92,10 @@ def image_url(day, number):
     return f"{MEDIA_BASE_URL}/day-{day:03}-{number:02}.jpg"
 
 
+def story_image_url(day, number):
+    return f"{MEDIA_BASE_URL}/day-{day:03}-{number:02}-story.jpg"
+
+
 def check_public_image(url):
     req = Request(url, headers={"User-Agent": "certiPass-instagram-publisher/1.0"})
     try:
@@ -154,32 +158,50 @@ def save_state(state):
     STATE.write_text(json.dumps(state, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
-def publish_story(day, entry, state):
-    if entry.get("story_id"):
-        announce(f"Story for day {day:02} is already published: {entry['story_id']}")
+def publish_story(day, entry, state, correction=False):
+    ids_key = "story_correction_ids" if correction else "story_ids"
+    pending_key = "story_correction_pending_frame" if correction else "story_pending_frame"
+    # The original day-1 Story used a cropped feed image. Preserve its ID and
+    # only create corrected frames when the explicit correction action runs.
+    if not correction and entry.get("story_id"):
+        announce(f"Original Story for day {day:02} is already published.")
         return
-    if entry.get("story_status") == "uncertain":
-        raise RuntimeError(f"Story for day {day:02} may already be live; check Instagram before retrying")
-    url = image_url(day, 1)
-    check_public_image(url)
-    container = request(f"{IG_USER_ID}/media", {
-        "media_type": "STORIES",
-        "image_url": url,
-    }, method="POST")
-    wait_until_ready(container["id"])
-    # Persist before publishing: an interrupted response must never cause an automatic duplicate.
-    entry["story_status"] = "uncertain"
-    save_state(state)
-    try:
-        result = request(f"{IG_USER_ID}/media_publish", {
-            "creation_id": container["id"]
+    ids = entry.setdefault(ids_key, [])
+    if len(ids) >= 2:
+        announce(f"Both Story frames for day {day:02} are already published.")
+        return
+    if entry.get(pending_key):
+        raise RuntimeError(
+            f"Story frame {entry[pending_key]} may already be live; check Instagram before retrying"
+        )
+    for number in (1, 2):
+        if len(ids) >= number:
+            continue
+        url = story_image_url(day, number)
+        check_public_image(url)
+        container = request(f"{IG_USER_ID}/media", {
+            "media_type": "STORIES",
+            "image_url": url,
         }, method="POST")
-    except RuntimeError as exc:
-        raise RuntimeError(f"Story result uncertain; check Instagram before retrying. {exc}") from exc
-    entry["story_id"] = result["id"]
-    entry["story_status"] = "published"
-    save_state(state)
-    announce(f"Published Story for day {day:02}: media ID {result['id']}")
+        wait_until_ready(container["id"])
+        # Persist before publishing: an interrupted response must not duplicate a frame.
+        entry[pending_key] = number
+        save_state(state)
+        try:
+            result = request(f"{IG_USER_ID}/media_publish", {
+                "creation_id": container["id"]
+            }, method="POST")
+        except RuntimeError as exc:
+            raise RuntimeError(
+                f"Story frame {number} result uncertain; check Instagram before retrying. {exc}"
+            ) from exc
+        ids.append(result["id"])
+        entry.pop(pending_key, None)
+        save_state(state)
+        announce(f"Published Story frame {number}/2 for day {day:02}: {result['id']}")
+    if not correction:
+        entry["story_status"] = "published"
+        save_state(state)
 
 
 def main():
@@ -204,11 +226,17 @@ def main():
     else:
         state["token_refreshed_at"] = today
         save_state(state)
+    if os.environ.get("CORRECT_DAY_1_STORY") == "true":
+        matches = [entry for entry in state.get("history", []) if int(entry["day"]) == 1]
+        if not matches:
+            raise RuntimeError("Day 1 was not published yet")
+        publish_story(1, matches[0], state, correction=True)
+        return
     if state.get("last_published_date") == today:
         entry = state["history"][-1]
         if entry["date"] != today:
             raise RuntimeError("Publishing history does not match today's date")
-        if entry.get("story_id"):
+        if entry.get("story_id") or len(entry.get("story_ids", [])) >= 2:
             announce(f"Carousel and Story already posted on {today} (Chișinău). Nothing to do.")
             return
         publish_story(int(entry["day"]), entry, state)
