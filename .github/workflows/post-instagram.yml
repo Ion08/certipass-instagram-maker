@@ -4,6 +4,9 @@ on:
   schedule:
     - cron: '0 18 * * *'
       timezone: 'Europe/Chisinau'
+    # Backup in case GitHub drops the start-of-hour scheduled event.
+    - cron: '20 18 * * *'
+      timezone: 'Europe/Chisinau'
   workflow_dispatch:
 
 permissions:
