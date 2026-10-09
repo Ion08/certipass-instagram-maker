@@ -1,6 +1,6 @@
 {
-  "next_day": 14,
-  "last_published_date": "2026-10-08",
+  "next_day": 15,
+  "last_published_date": "2026-10-09",
   "history": [
     {
       "day": 1,
@@ -66,6 +66,11 @@
       "day": 13,
       "date": "2026-10-08",
       "media_id": "18091694765662117"
+    },
+    {
+      "day": 14,
+      "date": "2026-10-09",
+      "media_id": "18218699461339553"
     }
   ],
   "token_refreshed_at": "2026-09-26"
